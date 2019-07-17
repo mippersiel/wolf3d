@@ -11,7 +11,7 @@
 
 #define GRMODE	VGAGR
 
-#include "VERSION.H"
+#include "version.h"
 
 typedef	enum	{false,true}	boolean;
 typedef	unsigned	char		byte;

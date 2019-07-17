@@ -1,22 +1,22 @@
 // ID_GLOB.H
 
 
-#include <ALLOC.H>
-#include <CTYPE.H>
-#include <DOS.H>
-#include <ERRNO.H>
-#include <FCNTL.H>
-#include <IO.H>
-#include <MEM.H>
-#include <PROCESS.H>
-#include <STDIO.H>
-#include <STDLIB.H>
-#include <STRING.H>
-#include <SYS\STAT.H>
-#include <VALUES.H>
-#include <DIR.H>
+#include <alloc.h>
+#include <ctype.h>
+#include <dos.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <io.h>
+#include <mem.h>
+#include <process.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys\stat.h>
+#include <values.h>
+#include <dir.h>
 #define __ID_GLOB__
-#include "VERSION.H"
+#include "version.h"
 
 //--------------------------------------------------------------------------
 
@@ -26,30 +26,30 @@ extern	char		far signon;
 
 #ifdef JAPAN
 #ifdef JAPDEMO
-#include "FOREIGN\JAPAN\GFXV_WJ1.H"
+#include "foreign\japan\gfxv_wj1.h"
 #else
-#include "FOREIGN\JAPAN\GFXV_WJ6.H"
+#include "foreign\japan\gfxv_wj6.h"
 #endif
-#include "AUDIOWL6.H"
-#include "MAPSWL6.H"
+#include "audiowl6.h"
+#include "mapswl6.h"
 #else
 
 #ifndef SPEAR
 
-#include "GFXV_WL6.H"
-#include "AUDIOWL6.H"
-#include "MAPSWL6.H"
+#include "gfxv_wl6.h"
+#include "audiowl6.h"
+#include "mapswl6.h"
 
 #else
 
 #ifndef SPEARDEMO
-#include "GFXV_SOD.H"
-#include "AUDIOSOD.H"
-#include "MAPSSOD.H"
+#include "gfxv_sod.h"
+#include "audiosod.h"
+#include "mapssod.h"
 #else
-#include "GFXV_SDM.H"
-#include "AUDIOSDM.H"
-#include "MAPSSDM.H"
+#include "gfxv_sdm.h"
+#include "audiosdm.h"
+#include "mapssdm.h"
 #endif
 
 #endif
@@ -83,14 +83,14 @@ typedef	struct
 #define	nil	((void *)0)
 
 
-#include "ID_MM.H"
-#include "ID_PM.H"
-#include "ID_CA.H"
-#include "ID_VL.H"
-#include "ID_VH.H"
-#include "ID_IN.H"
-#include "ID_SD.H"
-#include "ID_US.H"
+#include "id_mm.h"
+#include "id_pm.h"
+#include "id_ca.h"
+#include "id_vl.h"
+#include "id_vh.h"
+#include "id_in.h"
+#include "id_sd.h"
+#include "id_us.h"
 
 
 void	Quit (char *error);		// defined in user program
