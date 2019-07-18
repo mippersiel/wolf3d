@@ -1,20 +1,16 @@
 // ID_GLOB.H
 
 
-#include <alloc.h>
+#include <malloc.h>
 #include <ctype.h>
-#include <dos.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <io.h>
-#include <mem.h>
-#include <process.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys\stat.h>
 #include <values.h>
-#include <dir.h>
 #define __ID_GLOB__
 #include "version.h"
 

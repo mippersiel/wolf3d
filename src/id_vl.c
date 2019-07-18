@@ -1,12 +1,9 @@
 // ID_VL.C
 
-#include <dos.h>
-#include <alloc.h>
-#include <mem.h>
+#include <malloc.h>
 #include <string.h>
 #include "id_head.h"
 #include "id_vl.h"
-#pragma hdrstop
 
 //
 // SC_INDEX is expected to stay at SC_MAPMASK for proper operation

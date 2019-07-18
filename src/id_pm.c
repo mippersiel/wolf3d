@@ -5,7 +5,6 @@
 //
 
 #include "id_heads.h"
-#pragma hdrstop
 
 //	Main Mem specific variables
 	boolean			MainPresent;

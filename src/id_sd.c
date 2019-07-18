@@ -28,16 +28,13 @@
 //			NeedsMusic - load music?
 //
 
-#pragma hdrstop		// Wierdo thing with MUSE
 
-#include <dos.h>
 
 #ifdef	_MUSE_      // Will be defined in ID_Types.h
 #include "id_sd.h"
 #else
 #include "id_heads.h"
 #endif
-#pragma	hdrstop
 #pragma	warn	-pia
 
 #ifdef	nil

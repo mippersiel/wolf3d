@@ -1,8 +1,6 @@
 // WL_DRAW.C
 
 #include "wl_def.h"
-#include <dos.h>
-#pragma hdrstop
 
 //#define DEBUGWALLS
 //#define DEBUGTICS

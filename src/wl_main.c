@@ -1,8 +1,6 @@
 // WL_MAIN.C
 
-#include <conio.h>
 #include "wl_def.h"
-#pragma hdrstop
 
 
 /*
@@ -95,7 +93,7 @@ void ReadConfig(void)
 	SDSMode         sds;
 
 
-	if ( (file = open(configname,O_BINARY | O_RDONLY)) != -1)
+	if ( (file = open(configname,O_RDONLY)) != -1)
 	{
 	//
 	// valid config file
@@ -194,8 +192,8 @@ void WriteConfig(void)
 {
 	int                     file;
 
-	file = open(configname,O_CREAT | O_BINARY | O_WRONLY,
-				S_IREAD | S_IWRITE | S_IFREG);
+	file = open(configname,O_CREAT | O_WRONLY,
+	        S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 	if (file != -1)
 	{
@@ -228,42 +226,7 @@ void WriteConfig(void)
 
 
 /*
-========================
-=
-= Patch386
-=
-= Patch ldiv to use 32 bit instructions
-=
-========================
-*/
 
-char    *JHParmStrings[] = {"no386",nil};
-void Patch386 (void)
-{
-extern void far jabhack2(void);
-extern int far  CheckIs386(void);
-
-	int     i;
-
-	for (i = 1;i < _argc;i++)
-		if (US_CheckParm(_argv[i],JHParmStrings) == 0)
-		{
-			IsA386 = false;
-			return;
-		}
-
-	if (CheckIs386())
-	{
-		IsA386 = true;
-		jabhack2();
-	}
-	else
-		IsA386 = false;
-}
-
-//===========================================================================
-
-/*
 =====================
 =
 = NewGame
@@ -322,6 +285,9 @@ long DoChecksum(byte far *source,unsigned size,long checksum)
 
 boolean SaveTheGame(int file,int x,int y)
 {
+    /*
+     * TODO Implement later
+     *
 	struct diskfree_t dfree;
 	long avail,size,checksum;
 	objtype *ob,nullobj;
@@ -426,7 +392,7 @@ boolean SaveTheGame(int file,int x,int y)
 	// WRITE OUT CHECKSUM
 	//
 	CA_FarWrite (file,(void far *)&checksum,sizeof(checksum));
-
+*/
 	return(true);
 }
 
@@ -442,6 +408,9 @@ boolean SaveTheGame(int file,int x,int y)
 
 boolean LoadTheGame(int file,int x,int y)
 {
+    /*
+     * TODO Implement later
+     *
 	long checksum,oldchecksum;
 	objtype *ob,nullobj;
 
@@ -538,7 +507,7 @@ boolean LoadTheGame(int file,int x,int y)
 	   gamestate.bestweapon = wp_pistol;
 	 gamestate.ammo = 8;
 	}
-
+    */
 	return true;
 }
 
@@ -644,10 +613,8 @@ void CalcProjection (long focal)
 	long            intang;
 	float   angle;
 	double  tang;
-	double  planedist;
-	double  globinhalf;
 	int             halfview;
-	double  halfangle,facedist;
+	double  facedist;
 
 
 	focallength = focal;
@@ -726,6 +693,9 @@ void SetupWalls (void)
 
 void SignonScreen (void)                        // VGA version
 {
+    /*
+     * TODO Will most probably ditch
+     *
 	unsigned        segstart,seglength;
 
 	VL_SetVGAPlaneMode ();
@@ -751,6 +721,7 @@ void SignonScreen (void)                        // VGA version
 		seglength--;
 	}
 	MML_UseSpace (segstart,seglength);
+	*/
 }
 
 
@@ -764,7 +735,9 @@ void SignonScreen (void)                        // VGA version
 
 void FinishSignon (void)
 {
-
+    /*
+     *  TODO Will most probably ditch
+     *
 #ifndef SPEAR
 	VW_Bar (0,189,300,11,peekb(0xa000,0));
 	WindowX = 0;
@@ -804,6 +777,7 @@ void FinishSignon (void)
 	if (!NoWait)
 		VW_WaitVBL(3*70);
 #endif
+     */
 }
 
 //===========================================================================
@@ -816,20 +790,20 @@ void FinishSignon (void)
 =================
 */
 
-boolean MS_CheckParm (char far *check)
+boolean MS_CheckParm (int argc, char **argv, char far *check)
 {
 	int             i;
 	char    *parm;
 
-	for (i = 1;i<_argc;i++)
+	for (i = 1;i<argc;i++)
 	{
-		parm = _argv[i];
+		parm = argv[i];
 
 		while ( !isalpha(*parm) )       // skip - / \ etc.. in front of parm
 			if (!*parm++)
 				break;                          // hit end of string without an alphanum
 
-		if ( !_fstricmp(check,parm) )
+		if ( strcmp(check,parm) == 0 )
 			return true;
 	}
 
@@ -1012,6 +986,13 @@ CP_itemtype far MusicMenu[]=
 #endif
 
 #ifndef SPEARDEMO
+struct dostime_t
+{
+    unsigned char hour;     // [0-23]
+    unsigned char minute;   // [0-59]
+    unsigned char second;   // [0-59]
+    unsigned char hsecond;  // hundreths of a second 0-99
+};
 void DoJukebox(void)
 {
 	int which,lastsong=-1;
@@ -1063,7 +1044,13 @@ void DoJukebox(void)
 
 #ifndef SPEAR
 #ifndef UPLOAD
+	/* FIXME
 	_dos_gettime(&time);
+    */
+    time.hour = 5;
+    time.minute = 15;
+    time.second = 0;
+    time.hsecond = 0;
 	start = (time.hsecond%3)*6;
 #else
 	start = 0;
@@ -1142,12 +1129,12 @@ void DoJukebox(void)
 ==========================
 */
 
-void InitGame (void)
+void InitGame (int argc, char **argv)
 {
 	int                     i,x,y;
 	unsigned        *blockstart;
 
-	if (MS_CheckParm ("virtual"))
+	if (MS_CheckParm (argc, argv, "virtual"))
 		virtualreality = true;
 	else
 		virtualreality = false;
@@ -1168,16 +1155,16 @@ void InitGame (void)
 #ifndef SPEAR
 	if (mminfo.mainmem < 235000L)
 #else
-	if (mminfo.mainmem < 257000L && !MS_CheckParm("debugmode"))
+	if (mminfo.mainmem < 257000L && !MS_CheckParm(argc, argv, "debugmode"))
 #endif
 	{
-		memptr screen;
+		//memptr screen; TODO check this
 
 		CA_CacheGrChunk (ERRORSCREEN);
-		screen = grsegs[ERRORSCREEN];
+		//screen = grsegs[ERRORSCREEN]; TODO check this
 		ShutdownId();
-		movedata ((unsigned)screen,7+7*160,0xb800,0,17*160);
-		gotoxy (1,23);
+		//movedata ((unsigned)screen,7+7*160,0xb800,0,17*160); TODO check this
+		//gotoxy (1,23); TODO check this
 		exit(1);
 	}
 
@@ -1261,7 +1248,7 @@ close(profilehandle);
 	if (virtualreality)
 	{
 		NoWait = true;
-		geninterrupt(0x60);
+		// geninterrupt(0x60); TODO check this
 	}
 }
 
@@ -1345,44 +1332,46 @@ void NewViewSize (int width)
 
 void Quit (char *error)
 {
-	unsigned        finscreen;
-	memptr	screen;
+	//unsigned        finscreen;
+	//memptr	screen;
 
 	if (virtualreality)
-		geninterrupt(0x61);
+	{
+	//	geninterrupt(0x61);  TODO check this
+	}
 
 	ClearMemory ();
 	if (!*error)
 	{
 	 #ifndef JAPAN
 	 CA_CacheGrChunk (ORDERSCREEN);
-	 screen = grsegs[ORDERSCREEN];
+	 //screen = grsegs[ORDERSCREEN];  TODO check this
 	 #endif
 	 WriteConfig ();
 	}
 	else
 	{
 	 CA_CacheGrChunk (ERRORSCREEN);
-	 screen = grsegs[ERRORSCREEN];
+	 //screen = grsegs[ERRORSCREEN];  TODO check this
 	}
 
 	ShutdownId ();
 
 	if (error && *error)
 	{
-	  movedata ((unsigned)screen,7,0xb800,0,7*160);
-	  gotoxy (10,4);
+	  // movedata ((unsigned)screen,7,0xb800,0,7*160); TODO check this
+	  // gotoxy (10,4);  TODO check this
 	  puts(error);
-	  gotoxy (1,8);
+	  // gotoxy (1,8);  TODO check this
 	  exit(1);
 	}
 	else
 	if (!error || !(*error))
 	{
-		clrscr();
+		// clrscr();  TODO check this
 		#ifndef JAPAN
-		movedata ((unsigned)screen,7,0xb800,0,4000);
-		gotoxy(1,24);
+		// movedata ((unsigned)screen,7,0xb800,0,4000);  TODO check this
+		// gotoxy(1,24);  TODO check this
 		#endif
 //asm	mov	bh,0
 //asm	mov	dh,23	// row
@@ -1407,13 +1396,11 @@ void Quit (char *error)
 */
 
 static  char *ParmStrings[] = {"baby","easy","normal","hard",""};
-
-void    DemoLoop (void)
+extern void PG13 (void);
+void    DemoLoop (int argc, char **argv)
 {
 	static int LastDemo;
 	int     i,level;
-	long nsize;
-	memptr	nullblock;
 
 //
 // check for launch from ted
@@ -1423,9 +1410,9 @@ void    DemoLoop (void)
 		NoWait = true;
 		NewGame(1,0);
 
-		for (i = 1;i < _argc;i++)
+		for (i = 1;i < argc;i++)
 		{
-			if ( (level = US_CheckParm(_argv[i],ParmStrings)) != -1)
+			if ( (level = US_CheckParm(argv[i],ParmStrings)) != -1)
 			{
 			 gamestate.difficulty=level;
 			 break;
@@ -1552,9 +1539,9 @@ void    DemoLoop (void)
 		VW_FadeOut ();
 
 #ifndef SPEAR
-		if (Keyboard[sc_Tab] && MS_CheckParm("goobers"))
+		if (Keyboard[sc_Tab] && MS_CheckParm(argc, argv, "goobers"))
 #else
-		if (Keyboard[sc_Tab] && MS_CheckParm("debugmode"))
+		if (Keyboard[sc_Tab] && MS_CheckParm(argc, argv, "debugmode"))
 #endif
 			RecordDemo ();
 		else
@@ -1583,33 +1570,13 @@ void    DemoLoop (void)
 
 char    *nosprtxt[] = {"nospr",nil};
 
-void main (void)
+int main(int argc, char **argv)
 {
-	int     i;
-
-
-#ifdef BETA
-	//
-	// THIS IS FOR BETA ONLY!
-	//
-	struct dosdate_t d;
-
-	_dos_getdate(&d);
-	if (d.year > YEAR ||
-		(d.month >= MONTH && d.day >= DAY))
-	{
-	 printf("Sorry, BETA-TESTING is over. Thanks for you help.\n");
-	 exit(1);
-	}
-#endif
-
 	CheckForEpisodes();
 
-	Patch386 ();
+	InitGame (argc, argv);
 
-	InitGame ();
-
-	DemoLoop();
+	DemoLoop(argc, argv);
 
 	Quit("Demo loop exited???");
 }

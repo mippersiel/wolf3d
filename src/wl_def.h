@@ -1,7 +1,3 @@
-//#define BETA
-#define YEAR	1992
-#define MONTH	9
-#define DAY		30
 
 #include "id_heads.h"
 #include <math.h>
@@ -699,7 +695,7 @@ typedef enum	{
 } weapontype;
 
 
-typedef enum	{
+enum	{
 	gd_baby,
 	gd_easy,
 	gd_medium,
@@ -756,7 +752,7 @@ typedef	enum	{
 =============================================================================
 */
 
-extern	boolean		MS_CheckParm (char far *string);
+extern	boolean		MS_CheckParm (int argc, char **argv, char far *string);
 
 extern	char		str[80],str2[20];
 extern	int			tedlevelnum;
