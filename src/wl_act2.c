@@ -266,7 +266,6 @@ boolean ProjectileTryMove (objtype *ob)
 {
 	int			xl,yl,xh,yh,x,y;
 	objtype		*check;
-	long		deltax,deltay;
 
 	xl = (ob->x-PROJSIZE) >>TILESHIFT;
 	yl = (ob->y-PROJSIZE) >>TILESHIFT;
@@ -934,8 +933,6 @@ void SpawnDeadGuard (int tilex, int tiley)
 
 void SpawnBoss (int tilex, int tiley)
 {
-	unsigned	far *map,tile;
-
 	SpawnNewObj (tilex,tiley,&s_bossstand);
 	new->speed = SPDPATROL;
 
@@ -957,8 +954,6 @@ void SpawnBoss (int tilex, int tiley)
 
 void SpawnGretel (int tilex, int tiley)
 {
-	unsigned	far *map,tile;
-
 	SpawnNewObj (tilex,tiley,&s_gretelstand);
 	new->speed = SPDPATROL;
 
@@ -1992,8 +1987,6 @@ moveok:
 
 void SpawnGhosts (int which, int tilex, int tiley)
 {
-	unsigned	far *map,tile;
-
 	switch(which)
 	{
 	 case en_blinky:
@@ -2210,8 +2203,6 @@ statetype s_fatshoot6 	= {false,SPR_FAT_SHOOT4,10,NULL,T_Shoot,&s_fatchase1};
 
 void SpawnSchabbs (int tilex, int tiley)
 {
-	unsigned	far *map,tile;
-
 	if (DigiMode != sds_Off)
 		s_schabbdie2.tictime = 140;
 	else
@@ -2239,8 +2230,6 @@ void SpawnSchabbs (int tilex, int tiley)
 
 void SpawnGift (int tilex, int tiley)
 {
-	unsigned	far *map,tile;
-
 	if (DigiMode != sds_Off)
 	  s_giftdie2.tictime = 140;
 	else
@@ -2268,8 +2257,6 @@ void SpawnGift (int tilex, int tiley)
 
 void SpawnFat (int tilex, int tiley)
 {
-	unsigned	far *map,tile;
-
 	if (DigiMode != sds_Off)
 	  s_fatdie2.tictime = 140;
 	else
@@ -3256,7 +3243,6 @@ void T_Ghosts (objtype *ob)
 void T_DogChase (objtype *ob)
 {
 	long 	move;
-	int		dist,chance;
 	long	dx,dy;
 
 
@@ -3366,7 +3352,6 @@ void SelectPathDir (objtype *ob)
 void T_Path (objtype *ob)
 {
 	long 	move;
-	long 	deltax,deltay,size;
 
 	if (SightPlayer (ob))
 		return;
@@ -3529,8 +3514,6 @@ void T_Shoot (objtype *ob)
 void T_Bite (objtype *ob)
 {
 	long	dx,dy;
-	int	hitchance,damage;
-
 
 	PlaySoundLocActor(DOGATTACKSND,ob);	// JAB
 
@@ -3619,8 +3602,6 @@ statetype s_deathcam = {false,0,0,NULL,NULL,NULL};
 
 void SpawnBJVictory (void)
 {
-	unsigned	far *map,tile;
-
 	SpawnNewObj (player->tilex,player->tiley+1,&s_bjrun1);
 	new->x = player->x;
 	new->y = player->y;
@@ -3708,7 +3689,6 @@ void T_BJYell (objtype *ob)
 ===============
 */
 
-#pragma argsused
 void T_BJDone (objtype *ob)
 {
 	playstate = ex_victorious;				// exit castle tile

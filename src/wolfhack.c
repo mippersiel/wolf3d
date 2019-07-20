@@ -45,12 +45,11 @@ int		mr_dest;
 void DrawSpans (int x1, int x2, int height)
 {
 	fixed		length;
-	int			ofs;
 	int			prestep;
 	fixed		startxfrac, startyfrac;
 
-	int			x, startx, count, plane, startplane;
-	byte		far	*toprow, far *dest;
+	int			startx, plane, startplane;
+	byte		far	*toprow;
 
 	toprow = planeylookup[height]+bufferofs;
 	mr_rowofs = mirrorofs[height];
