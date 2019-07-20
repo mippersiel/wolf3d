@@ -11,7 +11,8 @@ RM    = rm -rf
 # Keywords in code that are stripped out
 STRIPPED_KW = far \
               _seg \
-              huge
+              huge \
+              near
 STRIPDEFS = $(patsubst %,-D%=,$(STRIPPED_KW))
 
 
@@ -20,7 +21,9 @@ SRCDIR   = src
 SOURCES  = $(SRCDIR)/wl_main.c \
            $(SRCDIR)/wl_act1.c \
            $(SRCDIR)/wl_act2.c \
-           $(SRCDIR)/wolfhack.c
+           $(SRCDIR)/wolfhack.c \
+           $(SRCDIR)/wl_agent.c \
+           $(SRCDIR)/wl_draw.c
 #           $(SRCDIR)/contigsc.c \
 #           $(SRCDIR)/detect.c \
 #           $(SRCDIR)/id_ca.c \
@@ -33,9 +36,7 @@ SOURCES  = $(SRCDIR)/wl_main.c \
 #           $(SRCDIR)/id_vl.c \
 #           $(SRCDIR)/munge.c \
 #           $(SRCDIR)/oldscale.c \
-#           $(SRCDIR)/wl_agent.c \
 #           $(SRCDIR)/wl_debug.c \
-#           $(SRCDIR)/wl_draw.c \
 #           $(SRCDIR)/wl_game.c \
 #           $(SRCDIR)/wl_inter.c \
 #           $(SRCDIR)/wl_menu.c \
@@ -68,12 +69,14 @@ all: $(OUTDIR)/wolf3d
 
 $(OUTDIR)/wolf3d: $(OBJECTS) | $(OUTDIR)
 	@printf "LD\t$(notdir $@)\n"
-	@$(CC) $(OBJECTS) $(UI_OBJS) $(CSS_OBJS) $(LDFLAGS) -o $@
+#	@$(CC) $(OBJECTS) $(UI_OBJS) $(CSS_OBJS) $(LDFLAGS) -o $@
+# Dont try to link now, too many errors for nothing
+	@touch $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-#	@printf "CC\t$(notdir $<)\n"
+	@printf "CC\t$(notdir $<)\n"
 	@$(CC) $(CFLAGS) -M -MF $(patsubst %.o,%.d,$@) -MT $@ $<
-	$(CC) $(CFLAGS) -c -o $@ $<
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
 $(OBJECTS): | $(OBJDIRS)
 

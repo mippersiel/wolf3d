@@ -134,51 +134,47 @@ void AsmRefresh (void);			// in WL_DR_A.ASM
 ========================
 */
 
-#pragma warn -rvl			// I stick the return value in with ASMs
+// FIXME I stick the return value in with ASMs
 
 fixed FixedByFrac (fixed a, fixed b)
 {
-//
-// setup
-//
-asm	mov	si,[WORD PTR b+2]	// sign of result = sign of fraction
-
-asm	mov	ax,[WORD PTR a]
-asm	mov	cx,[WORD PTR a+2]
-
-asm	or	cx,cx
-asm	jns	aok:				// negative?
-asm	neg	cx
-asm	neg	ax
-asm	sbb	cx,0
-asm	xor	si,0x8000			// toggle sign of result
+    /*
+    //
+    // setup
+    //
+    __asm__ __volatile__("mov si,[WORD PTR b+2];\n\t" // sign of result = sign of fraction
+                         "mov ax,[WORD PTR a];\n\t"
+                         "mov cx,[WORD PTR a+2];\n\t"
+                         "or cx,cx;\n\t"
+                         "jns aok:;\n\t" // negative?
+                         "neg cx;\n\t"
+                         "neg ax;\n\t"
+                         "sbb cx,0;\n\t"
+                         "xor si,0x8000;\n\t"); // toggle sign of result
 aok:
 
-//
-// multiply  cx:ax by bx
-//
-asm	mov	bx,[WORD PTR b]
-asm	mul	bx					// fraction*fraction
-asm	mov	di,dx				// di is low word of result
-asm	mov	ax,cx				//
-asm	mul	bx					// units*fraction
-asm add	ax,di
-asm	adc	dx,0
+    //
+    // multiply  cx:ax by bx
+    //
+    __asm__ __volatile__("mov bx,[WORD PTR b];\n\t"
+                         "mul bx;\n\t" // fraction*fraction
+                         "mov di,dx;\n\t" // di is low word of result
+                         "mov ax,cx;\n\t" //
+                         "mul bx;\n\t" // units*fraction
+                         "add ax,di;\n\t"
+                         "adc dx,0;\n\t");
 
-//
-// put result dx:ax in 2's complement
-//
-asm	test	si,0x8000		// is the result negative?
-asm	jz	ansok:
-asm	neg	dx
-asm	neg	ax
-asm	sbb	dx,0
-
+    //
+    // put result dx:ax in 2's complement
+    //
+    __asm__ __volatile__("test si,0x8000;\n\t" // is the result negative?
+                         "jz ansok:;\n\t"
+                         "neg dx;\n\t"
+                         "neg ax;\n\t"
+                         "sbb dx,0;\n\t");
 ansok:;
-
+TODO */
 }
-
-#pragma warn +rvl
 
 //==========================================================================
 
@@ -207,9 +203,8 @@ ansok:;
 //
 void TransformActor (objtype *ob)
 {
-	int ratio;
 	fixed gx,gy,gxt,gyt,nx,ny;
-	long	temp;
+	long	temp=0;
 
 //
 // translate point to view centered coordinates
@@ -250,11 +245,13 @@ void TransformActor (objtype *ob)
 //
 // calculate height (heightnumerator/(nx>>8))
 //
-	asm	mov	ax,[WORD PTR heightnumerator]
-	asm	mov	dx,[WORD PTR heightnumerator+2]
-	asm	idiv	[WORD PTR nx+1]			// nx>>8
-	asm	mov	[WORD PTR temp],ax
-	asm	mov	[WORD PTR temp+2],dx
+/*
+    __asm__ __volatile__("mov ax,[WORD PTR heightnumerator];\n\t"
+                         "mov dx,[WORD PTR heightnumerator+2];\n\t"
+                         "idiv [WORD PTR nx+1];\n\t" // nx>>8
+                         "mov [WORD PTR temp],ax;\n\t"
+                         "mov [WORD PTR temp+2],dx;\n\t");
+TODO */
 
 	ob->viewheight = temp;
 }
@@ -284,9 +281,8 @@ void TransformActor (objtype *ob)
 
 boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 {
-	int ratio;
 	fixed gx,gy,gxt,gyt,nx,ny;
-	long	temp;
+	long	temp=0;
 
 //
 // translate point to view centered coordinates
@@ -323,11 +319,13 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 //
 // calculate height (heightnumerator/(nx>>8))
 //
-	asm	mov	ax,[WORD PTR heightnumerator]
-	asm	mov	dx,[WORD PTR heightnumerator+2]
-	asm	idiv	[WORD PTR nx+1]			// nx>>8
-	asm	mov	[WORD PTR temp],ax
-	asm	mov	[WORD PTR temp+2],dx
+/*
+    __asm__ __volatile__("mov ax,[WORD PTR heightnumerator];\n\t"
+                         "mov dx,[WORD PTR heightnumerator+2];\n\t"
+                         "idiv [WORD PTR nx+1];\n\t" // nx>>8
+                         "mov [WORD PTR temp],ax;\n\t"
+                         "mov [WORD PTR temp+2],dx;\n\t");
+TODO */
 
 	*dispheight = temp;
 
@@ -352,13 +350,11 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 ====================
 */
 
-#pragma warn -rvl			// I stick the return value in with ASMs
+// FIXME I stick the return value in with ASMs
 
 int	CalcHeight (void)
 {
-	int	transheight;
-	int ratio;
-	fixed gxt,gyt,nx,ny;
+	fixed gxt,gyt,nx;
 	long	gx,gy;
 
 	gx = xintercept-viewx;
@@ -374,10 +370,11 @@ int	CalcHeight (void)
   //
 	if (nx<mindist)
 		nx=mindist;			// don't let divide overflow
-
-	asm	mov	ax,[WORD PTR heightnumerator]
-	asm	mov	dx,[WORD PTR heightnumerator+2]
-	asm	idiv	[WORD PTR nx+1]			// nx>>8
+/*
+    __asm__ __volatile__("mov ax,[WORD PTR heightnumerator];\n\t"
+                         "mov dx,[WORD PTR heightnumerator+2];\n\t"
+                         "idiv [WORD PTR nx+1];\n\t"); // nx>>8
+TODO */
 }
 
 
@@ -397,62 +394,60 @@ unsigned	postwidth;
 
 void	near ScalePost (void)		// VGA version
 {
-	asm	mov	ax,SCREENSEG
-	asm	mov	es,ax
+/*
+    __asm__ __volatile__("mov ax,SCREENSEG;\n\t"
+                         "mov es,ax;\n\t"
 
-	asm	mov	bx,[postx]
-	asm	shl	bx,1
-	asm	mov	bp,WORD PTR [wallheight+bx]		// fractional height (low 3 bits frac)
-	asm	and	bp,0xfff8				// bp = heightscaler*4
-	asm	shr	bp,1
-	asm	cmp	bp,[maxscaleshl2]
-	asm	jle	heightok
-	asm	mov	bp,[maxscaleshl2]
+                         "mov bx,[postx];\n\t"
+                         "shl bx,1;\n\t"
+                         "mov bp,WORD PTR [wallheight+bx];\n\t" // fractional height (low 3 bits frac)
+                         "and bp,0xfff8;\n\t" // bp = heightscaler*4
+                         "shr bp,1;\n\t"
+                         "cmp bp,[maxscaleshl2];\n\t"
+                         "jle heightok;\n\t"
+                         "mov bp,[maxscaleshl2];\n\t");
 heightok:
-	asm	add	bp,OFFSET fullscalefarcall
-	//
-	// scale a byte wide strip of wall
-	//
-	asm	mov	bx,[postx]
-	asm	mov	di,bx
-	asm	shr	di,2						// X in bytes
-	asm	add	di,[bufferofs]
+    __asm__ __volatile__("add bp,OFFSET fullscalefarcall;\n\t" //
+                         // scale a byte wide strip of wall
+                         //
+                         "mov bx,[postx];\n\t"
+                         "mov di,bx;\n\t"
+                         "shr di,2;\n\t" // X in bytes
+                         "add di,[bufferofs];\n\t"
 
-	asm	and	bx,3
-	asm	shl	bx,3						// bx = pixel*8+pixwidth
-	asm	add	bx,[postwidth]
+                         "and bx,3;\n\t"
+                         "shl bx,3;\n\t" // bx = pixel*8+pixwidth
+                         "add bx,[postwidth];\n\t"
 
-	asm	mov	al,BYTE PTR [mapmasks1-1+bx]	// -1 because no widths of 0
-	asm	mov	dx,SC_INDEX+1
-	asm	out	dx,al						// set bit mask register
-	asm	lds	si,DWORD PTR [postsource]
-	asm	call DWORD PTR [bp]				// scale the line of pixels
+                         "mov al,BYTE PTR [mapmasks1-1+bx];\n\t" // -1 because no widths of 0
+                         "mov dx,SC_INDEX+1;\n\t"
+                         "out dx,al;\n\t" // set bit mask register
+                         "lds si,DWORD PTR [postsource];\n\t"
+                         "call DWORD PTR [bp];\n\t" // scale the line of pixels
 
-	asm	mov	al,BYTE PTR [ss:mapmasks2-1+bx]   // -1 because no widths of 0
-	asm	or	al,al
-	asm	jz	nomore
+                         "mov al,BYTE PTR [ss:mapmasks2-1+bx];\n\t" // -1 because no widths of 0
+                         "or al,al;\n\t"
+                         "jz nomore;\n\t" //
+                         // draw a second byte for vertical strips that cross two bytes
+                         //
+                         "inc di;\n\t"
+                         "out dx,al;\n\t" // set bit mask register
+                         "call DWORD PTR [bp];\n\t" // scale the line of pixels
 
-	//
-	// draw a second byte for vertical strips that cross two bytes
-	//
-	asm	inc	di
-	asm	out	dx,al						// set bit mask register
-	asm	call DWORD PTR [bp]				// scale the line of pixels
-
-	asm	mov	al,BYTE PTR [ss:mapmasks3-1+bx]	// -1 because no widths of 0
-	asm	or	al,al
-	asm	jz	nomore
-	//
-	// draw a third byte for vertical strips that cross three bytes
-	//
-	asm	inc	di
-	asm	out	dx,al						// set bit mask register
-	asm	call DWORD PTR [bp]				// scale the line of pixels
+                         "mov al,BYTE PTR [ss:mapmasks3-1+bx];\n\t" // -1 because no widths of 0
+                         "or al,al;\n\t"
+                         "jz nomore;\n\t" //
+                         // draw a third byte for vertical strips that cross three bytes
+                         //
+                         "inc di;\n\t"
+                         "out dx,al;\n\t" // set bit mask register
+                         "call DWORD PTR [bp];\n\t"); // scale the line of pixels
 
 
 nomore:
-	asm	mov	ax,ss
-	asm	mov	ds,ax
+    __asm__ __volatile__("mov ax,ss;\n\t"
+                         "mov ds,ax;\n\t");
+TODO */
 }
 
 void  FarScalePost (void)				// just so other files can call
@@ -498,7 +493,7 @@ void HitVertWall (void)
 		else
 		{
 			ScalePost ();
-			(unsigned)postsource = texture;
+			postsource = texture;
 			postwidth = 1;
 			postx = pixx;
 		}
@@ -528,7 +523,7 @@ void HitVertWall (void)
 			wallpic = vertwall[tilehit];
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(wallpic);
-		(unsigned)postsource = texture;
+		postsource = texture;
 
 	}
 }
@@ -570,7 +565,7 @@ void HitHorizWall (void)
 		else
 		{
 			ScalePost ();
-			(unsigned)postsource = texture;
+			postsource = texture;
 			postwidth = 1;
 			postx = pixx;
 		}
@@ -600,7 +595,7 @@ void HitHorizWall (void)
 			wallpic = horizwall[tilehit];
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(wallpic);
-		(unsigned)postsource = texture;
+		postsource = texture;
 	}
 
 }
@@ -637,7 +632,7 @@ void HitHorizDoor (void)
 		else
 		{
 			ScalePost ();
-			(unsigned)postsource = texture;
+			postsource = texture;
 			postwidth = 1;
 			postx = pixx;
 		}
@@ -669,7 +664,7 @@ void HitHorizDoor (void)
 		}
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(doorpage);
-		(unsigned)postsource = texture;
+		postsource = texture;
 	}
 }
 
@@ -705,7 +700,7 @@ void HitVertDoor (void)
 		else
 		{
 			ScalePost ();
-			(unsigned)postsource = texture;
+			postsource = texture;
 			postwidth = 1;
 			postx = pixx;
 		}
@@ -737,7 +732,7 @@ void HitVertDoor (void)
 		}
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(doorpage+1);
-		(unsigned)postsource = texture;
+		postsource = texture;
 	}
 }
 
@@ -784,7 +779,7 @@ void HitHorizPWall (void)
 		else
 		{
 			ScalePost ();
-			(unsigned)postsource = texture;
+			postsource = texture;
 			postwidth = 1;
 			postx = pixx;
 		}
@@ -802,7 +797,7 @@ void HitHorizPWall (void)
 		wallpic = horizwall[tilehit&63];
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(wallpic);
-		(unsigned)postsource = texture;
+		postsource = texture;
 	}
 
 }
@@ -848,7 +843,7 @@ void HitVertPWall (void)
 		else
 		{
 			ScalePost ();
-			(unsigned)postsource = texture;
+			postsource = texture;
 			postwidth = 1;
 			postx = pixx;
 		}
@@ -866,7 +861,7 @@ void HitVertPWall (void)
 		wallpic = vertwall[tilehit&63];
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(wallpic);
-		(unsigned)postsource = texture;
+		postsource = texture;
 	}
 
 }
@@ -886,57 +881,55 @@ void HitVertPWall (void)
 
 void ClearScreen (void)
 {
- unsigned floor=egaFloor[gamestate.episode*10+mapon],
-	  ceiling=egaCeiling[gamestate.episode*10+mapon];
+    unsigned floor=egaFloor[gamestate.episode*10+mapon],
+             ceiling=egaCeiling[gamestate.episode*10+mapon];
 
-  //
-  // clear the screen
-  //
-asm	mov	dx,GC_INDEX
-asm	mov	ax,GC_MODE + 256*2		// read mode 0, write mode 2
-asm	out	dx,ax
-asm	mov	ax,GC_BITMASK + 255*256
-asm	out	dx,ax
+    //
+    // clear the screen
+    //
+    __asm__ __volatile__("mov dx,GC_INDEX;\n\t"
+                         "mov ax,GC_MODE + 256*2;\n\t" // read mode 0, write mode 2
+                         "out dx,ax;\n\t"
+                         "mov ax,GC_BITMASK + 255*256;\n\t"
+                         "out dx,ax;\n\t"
 
-asm	mov	dx,40
-asm	mov	ax,[viewwidth]
-asm	shr	ax,3
-asm	sub	dx,ax					// dx = 40-viewwidth/8
+                         "mov dx,40;\n\t"
+                         "mov ax,[viewwidth];\n\t"
+                         "shr ax,3;\n\t"
+                         "sub dx,ax;\n\t" // dx = 40-viewwidth/8
 
-asm	mov	bx,[viewwidth]
-asm	shr	bx,4					// bl = viewwidth/16
-asm	mov	bh,BYTE PTR [viewheight]
-asm	shr	bh,1					// half height
+                         "mov bx,[viewwidth];\n\t"
+                         "shr bx,4;\n\t" // bl = viewwidth/16
+                         "mov bh,BYTE PTR [viewheight];\n\t"
+                         "shr bh,1;\n\t" // half height
 
-asm	mov	ax,[ceiling]
-asm	mov	es,[screenseg]
-asm	mov	di,[bufferofs]
+                         "mov ax,[ceiling];\n\t"
+                         "mov es,[screenseg];\n\t"
+                         "mov di,[bufferofs];\n\t");
 
 toploop:
-asm	mov	cl,bl
-asm	rep	stosw
-asm	add	di,dx
-asm	dec	bh
-asm	jnz	toploop
+    __asm__ __volatile__("mov cl,bl;\n\t"
+                         "rep stosw;\n\t"
+                         "add di,dx;\n\t"
+                         "dec bh;\n\t"
+                         "jnz toploop;\n\t"
 
-asm	mov	bh,BYTE PTR [viewheight]
-asm	shr	bh,1					// half height
-asm	mov	ax,[floor]
+                         "mov bh,BYTE PTR [viewheight];\n\t"
+                         "shr bh,1;\n\t" // half height
+                         "mov ax,[floor];\n\t");
 
 bottomloop:
-asm	mov	cl,bl
-asm	rep	stosw
-asm	add	di,dx
-asm	dec	bh
-asm	jnz	bottomloop
+    __asm__ __volatile__("mov cl,bl;\n\t"
+                         "rep stosw;\n\t"
+                         "add di,dx;\n\t"
+                         "dec bh;\n\t"
+                         "jnz bottomloop;\n\t"
 
-
-asm	mov	dx,GC_INDEX
-asm	mov	ax,GC_MODE + 256*10		// read mode 1, write mode 2
-asm	out	dx,ax
-asm	mov	al,GC_BITMASK
-asm	out	dx,al
-
+                         "mov dx,GC_INDEX;\n\t"
+                         "mov ax,GC_MODE + 256*10;\n\t" // read mode 1, write mode 2
+                         "out dx,ax;\n\t"
+                         "mov al,GC_BITMASK;\n\t"
+                         "out dx,al;\n\t");
 }
 #endif
 //==========================================================================
@@ -967,46 +960,48 @@ unsigned vgaCeiling[]=
 
 void VGAClearScreen (void)
 {
- unsigned ceiling=vgaCeiling[gamestate.episode*10+mapon];
+/*
+    unsigned ceiling=vgaCeiling[gamestate.episode*10+mapon];
 
-  //
-  // clear the screen
-  //
-asm	mov	dx,SC_INDEX
-asm	mov	ax,SC_MAPMASK+15*256	// write through all planes
-asm	out	dx,ax
+    //
+    // clear the screen
+    //
+    __asm__ __volatile__("mov dx,SC_INDEX;\n\t"
+                         "mov ax,SC_MAPMASK+15*256;\n\t" // write through all planes
+                         "out dx,ax;\n\t"
 
-asm	mov	dx,80
-asm	mov	ax,[viewwidth]
-asm	shr	ax,2
-asm	sub	dx,ax					// dx = 40-viewwidth/2
+                         "mov dx,80;\n\t"
+                         "mov ax,[viewwidth];\n\t"
+                         "shr ax,2;\n\t"
+                         "sub dx,ax;\n\t" // dx = 40-viewwidth/2
 
-asm	mov	bx,[viewwidth]
-asm	shr	bx,3					// bl = viewwidth/8
-asm	mov	bh,BYTE PTR [viewheight]
-asm	shr	bh,1					// half height
+                         "mov bx,[viewwidth];\n\t"
+                         "shr bx,3;\n\t" // bl = viewwidth/8
+                         "mov bh,BYTE PTR [viewheight];\n\t"
+                         "shr bh,1;\n\t" // half height
 
-asm	mov	es,[screenseg]
-asm	mov	di,[bufferofs]
-asm	mov	ax,[ceiling]
+                         "mov es,[screenseg];\n\t"
+                         "mov di,[bufferofs];\n\t"
+                         "mov ax,[ceiling];\n\t");
 
 toploop:
-asm	mov	cl,bl
-asm	rep	stosw
-asm	add	di,dx
-asm	dec	bh
-asm	jnz	toploop
+    __asm__ __volatile__("mov cl,bl;\n\t"
+                         "rep stosw;\n\t"
+                         "add di,dx;\n\t"
+                         "dec bh;\n\t"
+                         "jnz toploop;\n\t"
 
-asm	mov	bh,BYTE PTR [viewheight]
-asm	shr	bh,1					// half height
-asm	mov	ax,0x1919
+                         "mov bh,BYTE PTR [viewheight];\n\t"
+                         "shr bh,1;\n\t" // half height
+                         "mov ax,0x1919;\n\t");
 
 bottomloop:
-asm	mov	cl,bl
-asm	rep	stosw
-asm	add	di,dx
-asm	dec	bh
-asm	jnz	bottomloop
+    __asm__ __volatile__("mov cl,bl;\n\t"
+                         "rep stosw;\n\t"
+                         "add di,dx;\n\t"
+                         "dec bh;\n\t"
+                         "jnz bottomloop;\n\t");
+TODO */
 }
 
 //==========================================================================
@@ -1069,10 +1064,8 @@ visobj_t	vislist[MAXVISABLE],*visptr,*visstep,*farthest;
 
 void DrawScaleds (void)
 {
-	int 		i,j,least,numvisable,height;
-	memptr		shape;
+	int 		i,least,numvisable,height;
 	byte		*tilespot,*visspot;
-	int			shapenum;
 	unsigned	spotloc;
 
 	statobj_t	*statptr;
@@ -1233,7 +1226,7 @@ void DrawPlayerWeapon (void)
 
 void CalcTics (void)
 {
-	long	newtime,oldtimecount;
+	long	newtime;
 
 //
 // calculate tics since last refresh for adaptive timing
@@ -1333,25 +1326,22 @@ void WallRefresh (void)
 
 void	ThreeDRefresh (void)
 {
-	int tracedir;
-
-// this wouldn't need to be done except for my debugger/video wierdness
-	outportb (SC_INDEX,SC_MAPMASK);
-
 //
 // clear out the traced array
 //
-asm	mov	ax,ds
-asm	mov	es,ax
-asm	mov	di,OFFSET spotvis
-asm	xor	ax,ax
-asm	mov	cx,2048							// 64*64 / 2
-asm	rep stosw
+/*
+    __asm__ __volatile__("mov ax,ds;\n\t"
+                         "mov es,ax;\n\t"
+                         "mov di,OFFSET spotvis;\n\t"
+                         "xor ax,ax;\n\t"
+                         "mov cx,2048;\n\t" // 64*64 / 2
+                         "rep stosw;\n\t");
+TODO */
 
 	bufferofs += screenofs;
 
 //
-// follow the walls from there to the right, drawwing as we go
+// follow the walls from there to the right, drawing as we go
 //
 	VGAClearScreen ();
 
@@ -1377,16 +1367,17 @@ asm	rep stosw
 
 	bufferofs -= screenofs;
 	displayofs = bufferofs;
-
-	asm	cli
-	asm	mov	cx,[displayofs]
-	asm	mov	dx,3d4h		// CRTC address register
-	asm	mov	al,0ch		// start address high register
-	asm	out	dx,al
-	asm	inc	dx
-	asm	mov	al,ch
-	asm	out	dx,al   	// set the high byte
-	asm	sti
+/*
+    __asm__ __volatile__("cli;\n\t"
+                         "mov cx,[displayofs];\n\t"
+                         "mov dx,3d4h;\n\t" // CRTC address register
+                         "mov al,0ch;\n\t" // start address high register
+                         "out dx,al;\n\t"
+                         "inc dx;\n\t"
+                         "mov al,ch;\n\t"
+                         "out dx,al;\n\t" // set the high byte
+                         "sti;\n\t");
+TODO */
 
 	bufferofs += SCREENSIZE;
 	if (bufferofs > PAGE3START)

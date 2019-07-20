@@ -115,7 +115,7 @@ void ClipMove (objtype *ob, long xmove, long ymove);
 
 void CheckWeaponChange (void)
 {
-	int	i,buttons;
+	int	i;
 
 	if (!gamestate.ammo)		// must use knife with no ammo
 		return;
@@ -148,9 +148,8 @@ void CheckWeaponChange (void)
 void ControlMovement (objtype *ob)
 {
 	long	oldx,oldy;
-	int		angle,maxxmove;
+	int		angle;
 	int		angleunits;
-	long	speed;
 
 	thrustspeed = 0;
 
@@ -927,7 +926,6 @@ void VictoryTile (void)
 void Thrust (int angle, long speed)
 {
 	long xmove,ymove;
-	long	slowmax;
 	unsigned	offset;
 
 
@@ -1006,7 +1004,6 @@ void Cmd_Fire (void)
 
 void Cmd_Use (void)
 {
-	objtype 	*check;
 	int			checkx,checky,doornum,dir;
 	boolean		elevatorok;
 
@@ -1182,6 +1179,8 @@ void	GunAttack (objtype *ob)
 	case wp_chaingun:
 		SD_PlaySound (ATKGATLINGSND);
 		break;
+    case wp_knife:
+        break;
 	}
 
 	madenoise = true;
