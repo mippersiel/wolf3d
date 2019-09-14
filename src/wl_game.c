@@ -219,7 +219,7 @@ void ClearMemory (void)
 
 void ScanInfoPlane (void)
 {
-	unsigned	x,y,i,j;
+	unsigned	x,y;
 	int			tile;
 	unsigned	far	*start;
 
@@ -623,8 +623,8 @@ void ScanInfoPlane (void)
 
 void SetupGameLevel (void)
 {
-	int	x,y,i;
-	unsigned	far *map,tile,spot;
+	int	x,y;
+	unsigned	far *map,tile;
 
 
 	if (!loadedgame)
@@ -670,13 +670,13 @@ void SetupGameLevel (void)
 			{
 			// solid wall
 				tilemap[x][y] = tile;
-				(unsigned)actorat[x][y] = tile;
+				actorat[x][y] = tile;
 			}
 			else
 			{
 			// area floor
 				tilemap[x][y] = 0;
-				(unsigned)actorat[x][y] = 0;
+				actorat[x][y] = 0;
 			}
 		}
 
@@ -866,7 +866,7 @@ void DrawPlayBorder (void)
 
 void DrawPlayScreen (void)
 {
-	int	i,j,p,m;
+	int	i;
 	unsigned	temp;
 
 	VW_FadeOut ();
@@ -1065,7 +1065,7 @@ void PlayDemo (int demonumber)
 	NewGame (1,0);
 	gamestate.mapon = *demoptr++;
 	gamestate.difficulty = gd_hard;
-	length = *((unsigned far *)demoptr)++;
+	length = (*((unsigned far *)demoptr))++;
 	demoptr++;
 	lastdemoptr = demoptr-4+length;
 
@@ -1236,8 +1236,6 @@ void Died (void)
 
 void GameLoop (void)
 {
-	int i,xl,yl,xh,yh;
-	char num[20];
 	boolean	died;
 #ifdef MYPROFILE
 	clock_t start,end;
@@ -1439,12 +1437,10 @@ startplayloop:
 
 			CheckHighScore (gamestate.score,gamestate.mapon+1);
 
-			#pragma warn -sus
 			#ifndef JAPAN
 			_fstrcpy(MainMenu[viewscores].string,STR_VS);
 			#endif
 			MainMenu[viewscores].routine = CP_ViewScores;
-			#pragma warn +sus
 
 			return;
 
@@ -1463,12 +1459,10 @@ startplayloop:
 
 			CheckHighScore (gamestate.score,gamestate.mapon+1);
 
-			#pragma warn -sus
 			#ifndef JAPAN
 			_fstrcpy(MainMenu[viewscores].string,STR_VS);
 			#endif
 			MainMenu[viewscores].routine = CP_ViewScores;
-			#pragma warn +sus
 
 			return;
 

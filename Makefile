@@ -23,7 +23,10 @@ SOURCES  = $(SRCDIR)/wl_main.c \
            $(SRCDIR)/wl_act2.c \
            $(SRCDIR)/wolfhack.c \
            $(SRCDIR)/wl_agent.c \
-           $(SRCDIR)/wl_draw.c
+           $(SRCDIR)/wl_draw.c \
+           $(SRCDIR)/wl_game.c \
+           $(SRCDIR)/wl_state.c \
+           $(SRCDIR)/wl_scale.c
 #           $(SRCDIR)/contigsc.c \
 #           $(SRCDIR)/detect.c \
 #           $(SRCDIR)/id_ca.c \
@@ -37,12 +40,9 @@ SOURCES  = $(SRCDIR)/wl_main.c \
 #           $(SRCDIR)/munge.c \
 #           $(SRCDIR)/oldscale.c \
 #           $(SRCDIR)/wl_debug.c \
-#           $(SRCDIR)/wl_game.c \
 #           $(SRCDIR)/wl_inter.c \
 #           $(SRCDIR)/wl_menu.c \
 #           $(SRCDIR)/wl_play.c \
-#           $(SRCDIR)/wl_scale.c \
-#           $(SRCDIR)/wl_state.c \
 #           $(SRCDIR)/wl_text.c
 
 # Include folders
@@ -65,7 +65,7 @@ INCDIRS   = $(patsubst %,-I%,$(INCLUDES))
 all: $(OUTDIR)/wolf3d
 
 # Include generated header dependencies for each source file
--include $(patsubst %.c,$(OBJDIR)/%.d,$(SOURCES))
+-include $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.d,$(SOURCES))
 
 $(OUTDIR)/wolf3d: $(OBJECTS) | $(OUTDIR)
 	@printf "LD\t$(notdir $@)\n"
