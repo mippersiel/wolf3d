@@ -206,7 +206,7 @@ int songs[]=
  XFUNKIE_MUS,
  XDEATH_MUS,
  XGETYOU_MUS,		// DON'T KNOW
- ULTIMATE_MUS,	// Trans Gr”sse
+ ULTIMATE_MUS,	// Trans Grï¿½sse
 
  DUNGEON_MUS,
  GOINGAFT_MUS,
@@ -377,8 +377,8 @@ void PollMouseMove (void)
 	int	mousexmove,mouseymove;
 
 	Mouse(MDelta);
-	mousexmove = _CX;
-	mouseymove = _DX;
+	// mousexmove = _CX; TODO fix this
+	// mouseymove = _DX; TODO fix this
 
 	controlx += mousexmove*10/(13-mouseadjustment);
 	controly += mouseymove*20/(13-mouseadjustment);
@@ -612,9 +612,7 @@ void	CenterWindow(word w,word h)
 
 void CheckKeys (void)
 {
-	int		i;
 	byte	scan;
-	unsigned	temp;
 
 
 	if (screenfaded || demoplayback)	// don't do anything with a faded screen
@@ -698,7 +696,7 @@ void CheckKeys (void)
 	if (Keyboard[sc_BackSpace] &&
 		Keyboard[sc_LShift] &&
 		Keyboard[sc_Alt] &&
-		MS_CheckParm("goobers"))
+		MS_CheckParmNoArg("goobers"))
 #else
 	if (Keyboard[sc_BackSpace] &&
 		Keyboard[sc_LShift] &&
@@ -949,8 +947,6 @@ void GetNewActor (void)
 
 void RemoveObj (objtype *gone)
 {
-	objtype **spotat;
-
 	if (gone == player)
 		Quit ("RemoveObj: Tried to remove the player!");
 
@@ -1003,8 +999,8 @@ void StopMusic(void)
 	for (i = 0;i < LASTMUSIC;i++)
 		if (audiosegs[STARTMUSIC + i])
 		{
-			MM_SetPurge(&((memptr)audiosegs[STARTMUSIC + i]),3);
-			MM_SetLock(&((memptr)audiosegs[STARTMUSIC + i]),false);
+			MM_SetPurge((memptr)&(audiosegs[STARTMUSIC + i]),3);
+			MM_SetLock((memptr)&(audiosegs[STARTMUSIC + i]),false);
 		}
 }
 
@@ -1036,7 +1032,7 @@ void StartMusic(void)
 		mmerror = false;
 	else
 	{
-		MM_SetLock(&((memptr)audiosegs[STARTMUSIC + chunk]),true);
+		MM_SetLock((memptr)&(audiosegs[STARTMUSIC + chunk]),true);
 		SD_StartMusic((MusicGroup far *)audiosegs[STARTMUSIC + chunk]);
 	}
 }
@@ -1366,7 +1362,6 @@ long funnyticount;
 
 void PlayLoop (void)
 {
-	int		give;
 	int	helmetangle;
 
 	playstate = TimeCount = lasttimecount = 0;

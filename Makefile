@@ -28,7 +28,9 @@ SOURCES  = $(SRCDIR)/wl_main.c \
            $(SRCDIR)/wl_state.c \
            $(SRCDIR)/wl_scale.c \
            $(SRCDIR)/wl_inter.c \
-           $(SRCDIR)/wl_menu.c
+           $(SRCDIR)/wl_menu.c \
+           $(SRCDIR)/wl_text.c \
+           $(SRCDIR)/wl_play.c
 #           $(SRCDIR)/contigsc.c \
 #           $(SRCDIR)/detect.c \
 #           $(SRCDIR)/id_ca.c \
@@ -41,9 +43,7 @@ SOURCES  = $(SRCDIR)/wl_main.c \
 #           $(SRCDIR)/id_vl.c \
 #           $(SRCDIR)/munge.c \
 #           $(SRCDIR)/oldscale.c \
-#           $(SRCDIR)/wl_debug.c \
-#           $(SRCDIR)/wl_play.c \
-#           $(SRCDIR)/wl_text.c
+#           $(SRCDIR)/wl_debug.c
 
 # Include folders
 INCLUDES = $(SRCDIR)

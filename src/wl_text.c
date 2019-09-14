@@ -351,7 +351,7 @@ void HandleCtrls (void)
 void HandleWord (void)
 {
 	char		word[WORDLIMIT];
-	int			i,wordindex;
+	int			wordindex;
 	unsigned	wwidth,wheight,newpos;
 
 
@@ -630,7 +630,6 @@ void ShowArticle (char far *article)
 							};
 	#endif
 	unsigned	oldfontnumber;
-	unsigned	temp;
 	boolean 	newpage,firstpage;
 
 	#ifdef JAPAN
@@ -711,7 +710,7 @@ void ShowArticle (char far *article)
 		}
 
 		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParmNoArg("goobers"))
 			PicturePause();
 		#endif
 
@@ -747,7 +746,6 @@ void HelpScreens (void)
 {
 	int			artnum;
 	char far 	*text;
-	memptr		layout;
 
 
 	CA_UpLevel ();
@@ -800,7 +798,6 @@ void EndText (void)
 {
 	int			artnum;
 	char far 	*text;
-	memptr		layout;
 
 
 	ClearMemory ();
