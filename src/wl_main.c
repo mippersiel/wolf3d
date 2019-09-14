@@ -789,11 +789,16 @@ void FinishSignon (void)
 =
 =================
 */
+static int storedArgc = 0;
+static char** storedArgv = NULL;
 
 boolean MS_CheckParm (int argc, char **argv, char far *check)
 {
 	int             i;
 	char    *parm;
+
+	storedArgc = argc;
+	storedArgv = argv;
 
 	for (i = 1;i<argc;i++)
 	{
@@ -808,6 +813,26 @@ boolean MS_CheckParm (int argc, char **argv, char far *check)
 	}
 
 	return false;
+}
+
+boolean MS_CheckParmNoArg (char far *check)
+{
+    int             i;
+    char    *parm;
+
+    for (i = 1;i<storedArgc;i++)
+    {
+        parm = storedArgv[i];
+
+        while ( !isalpha(*parm) )       // skip - / \ etc.. in front of parm
+            if (!*parm++)
+                break;                          // hit end of string without an alphanum
+
+        if ( strcmp(check,parm) == 0 )
+            return true;
+    }
+
+    return false;
 }
 
 //===========================================================================

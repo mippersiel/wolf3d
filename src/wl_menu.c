@@ -57,7 +57,6 @@ CP_iteminfo
 	NewEitems={NE_X,NE_Y,11,0,88},
 	NewItems={NM_X,NM_Y,4,2,24};
 
-#pragma warn -sus
 CP_itemtype far
 MainMenu[]=
 {
@@ -148,8 +147,6 @@ far CtlMenu[]=
 	{1,STR_CUSTOM,CustomControls}
 #endif
 },
-
-#pragma warn +sus
 
 #ifndef SPEAR
 far NewEmenu[]=
@@ -295,7 +292,7 @@ char SaveGameNames[10][32],SaveName[13]="SAVEGAM?.";
 // INPUT MANAGER SCANCODE TABLES
 //
 ////////////////////////////////////////////////////////////////////
-static byte
+static char
 					*ScanNames[] =		// Scan code names with single chars
 					{
 	"?","?","1","2","3","4","5","6","7","8","9","0","-","+","?","?",
@@ -330,7 +327,7 @@ static byte
 ////////////////////////////////////////////////////////////////////
 void US_ControlPanel(byte scancode)
 {
-	int which,i,start;
+	int which;
 
 
 	if (ingame)
@@ -346,15 +343,6 @@ void US_ControlPanel(byte scancode)
 	switch(scancode)
 	{
 		case sc_F1:
-			#ifdef SPEAR
-			BossKey();
-			#else
-			#ifdef GOODTIMES
-			BossKey();
-			#else
-			HelpScreens();
-			#endif
-			#endif
 			goto finishup;
 
 		case sc_F2:
@@ -514,12 +502,10 @@ void US_ControlPanel(byte scancode)
 	//
 	if (startgame || loadedgame)
 	{
-		#pragma warn -sus
 		MainMenu[viewscores].routine = NULL;
 		#ifndef JAPAN
-		_fstrcpy(MainMenu[viewscores].string,STR_EG);
+		strcpy(MainMenu[viewscores].string,STR_EG);
 		#endif
-		#pragma warn +sus
 	}
 
 	// RETURN/START GAME EXECUTION
@@ -561,9 +547,9 @@ void DrawMainMenu(void)
 		#ifndef JAPAN
 
 		#ifdef SPANISH
-		_fstrcpy(&MainMenu[backtodemo].string,STR_GAME);
+		strcpy(&MainMenu[backtodemo].string,STR_GAME);
 		#else
-		_fstrcpy(&MainMenu[backtodemo].string[8],STR_GAME);
+		strcpy(&MainMenu[backtodemo].string[8],STR_GAME);
 		#endif
 
 		#else
@@ -580,9 +566,9 @@ void DrawMainMenu(void)
 	{
 		#ifndef JAPAN
 		#ifdef SPANISH
-		_fstrcpy(&MainMenu[backtodemo].string,STR_BD);
+		strcpy(&MainMenu[backtodemo].string,STR_BD);
 		#else
-		_fstrcpy(&MainMenu[backtodemo].string[8],STR_DEMO);
+		strcpy(&MainMenu[backtodemo].string[8],STR_DEMO);
 		#endif
 		#else
 		CA_CacheGrChunk(C_MRETDEMOPIC);
@@ -615,31 +601,6 @@ void CP_ReadThis(void)
 #endif
 #endif
 
-#ifndef SPEAR
-#ifndef GOODTIMES
-#else
-////////////////////////////////////////////////////////////////////
-//
-// BOSS KEY
-//
-////////////////////////////////////////////////////////////////////
-void BossKey(void)
-{
-	SD_MusicOff();
-	_AX = 3;
-	geninterrupt(0x10);
-	printf("C>");
-	while (!Keyboard[sc_Escape])
-	IN_ClearKeysDown();
-
-	SD_MusicOn();
-	VL_SetVGAPlaneMode ();
-	VL_TestPaletteSet ();
-	VL_SetPalette (&gamepal);
-	LoadLatchMem();
-}
-#endif
-#endif
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -872,13 +833,11 @@ int CP_EndGame(void)
 	pickquick = gamestate.lives = 0;
 	playstate = ex_died;
 
-	#pragma warn -sus
 	MainMenu[savegame].active = 0;
 	MainMenu[viewscores].routine=CP_ViewScores;
 	#ifndef JAPAN
-	_fstrcpy(MainMenu[viewscores].string,STR_VS);
+	strcpy(MainMenu[viewscores].string,STR_VS);
 	#endif
-	#pragma warn +sus
 
 	return 1;
 }
@@ -1133,7 +1092,7 @@ void DrawNewGameDiff(int w)
 ////////////////////////////////////////////////////////////////////
 void CP_Sound(void)
 {
-	int which,i;
+	int which;
 
 
 #ifdef SPEAR
@@ -1387,7 +1346,7 @@ int CP_LoadGame(int quick)
 		if (SaveGamesAvail[which])
 		{
 			name[7]=which+'0';
-			handle=open(name,O_BINARY);
+			handle=open(name,O_RDONLY);
 			lseek(handle,32,SEEK_SET);
 			loadedgame=true;
 			LoadTheGame(handle,0,0);
@@ -1422,7 +1381,7 @@ int CP_LoadGame(int quick)
 			ShootSnd();
 			name[7]=which+'0';
 
-			handle=open(name,O_BINARY);
+			handle=open(name,O_RDONLY);
 			lseek(handle,32,SEEK_SET);
 
 			DrawLSAction(0);
@@ -1554,7 +1513,7 @@ int CP_SaveGame(int quick)
 		{
 			name[7]=which+'0';
 			unlink(name);
-			handle=creat(name,S_IREAD|S_IWRITE);
+			//handle=creat(name,S_IREAD|S_IWRITE); TODO fix this
 
 			strcpy(input,&SaveGameNames[which][0]);
 
@@ -1583,7 +1542,7 @@ int CP_SaveGame(int quick)
 			//
 			// OVERWRITE EXISTING SAVEGAME?
 			//
-			if (SaveGamesAvail[which])
+			if (SaveGamesAvail[which]) {
 				#ifdef JAPAN
 				if (!GetYorN(7,8,C_JAPSAVEOVERPIC))
 				#else
@@ -1599,6 +1558,7 @@ int CP_SaveGame(int quick)
 					PrintLSEntry(which,HIGHLIGHT);
 					VW_UpdateScreen();
 				}
+			}
 
 			ShootSnd();
 
@@ -1616,7 +1576,7 @@ int CP_SaveGame(int quick)
 				strcpy(&SaveGameNames[which][0],input);
 
 				unlink(name);
-				handle=creat(name,S_IREAD|S_IWRITE);
+				//handle=creat(name,S_IREAD|S_IWRITE); TODO fix this
 				_dos_write(handle,(void far *)input,32,&nwritten);
 				lseek(handle,32,SEEK_SET);
 
@@ -1696,7 +1656,7 @@ int CalibrateJoystick(void)
 		if (Keyboard[sc_Escape])
 			return 0;
 		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParmNoArg("goobers"))
 			PicturePause();
 		#endif
 
@@ -1730,7 +1690,7 @@ int CalibrateJoystick(void)
 		if (Keyboard[sc_Escape])
 			return 0;
 		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParmNoArg("goobers"))
 			PicturePause();
 		#endif
 	} while(!(jb&2));
@@ -1761,7 +1721,7 @@ void CP_Control(void)
 {
 	#define CTL_SPC	70
 	enum {MOUSEENABLE,JOYENABLE,USEPORT2,PADENABLE,MOUSESENS,CUSTOMIZE};
-	int i,which;
+	int which;
 
 
 #ifdef SPEAR
@@ -1780,7 +1740,7 @@ void CP_Control(void)
 		{
 			case MOUSEENABLE:
 				mouseenabled^=1;
-				_CX=_DX=CENTER;
+				//_CX=_DX=CENTER; TODO fix this
 				Mouse(4);
 				DrawCtlScreen();
 				CusItems.curpos=-1;
@@ -1927,7 +1887,7 @@ void MouseSensitivity(void)
 		}
 
 		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParmNoArgs("goobers"))
 		#else
 		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
 		#endif
@@ -2087,7 +2047,7 @@ void CustomControls(void)
 //
 void DefineMouseBtns(void)
 {
- CustomCtrls mouseallowed={0,1,1,1};
+ CustomCtrls mouseallowed = {{0,1,1,1}};
  EnterCtrlData(2,&mouseallowed,DrawCustMouse,PrintCustMouse,MOUSE);
 }
 
@@ -2098,7 +2058,7 @@ void DefineMouseBtns(void)
 //
 void DefineJoyBtns(void)
 {
- CustomCtrls joyallowed={1,1,1,1};
+ CustomCtrls joyallowed = {{1,1,1,1}};
  EnterCtrlData(5,&joyallowed,DrawCustJoy,PrintCustJoy,JOYSTICK);
 }
 
@@ -2109,7 +2069,7 @@ void DefineJoyBtns(void)
 //
 void DefineKeyBtns(void)
 {
- CustomCtrls keyallowed={1,1,1,1};
+ CustomCtrls keyallowed = {{1,1,1,1}};
  EnterCtrlData(8,&keyallowed,DrawCustKeybd,PrintCustKeybd,KEYBOARDBTNS);
 }
 
@@ -2120,7 +2080,7 @@ void DefineKeyBtns(void)
 //
 void DefineKeyMove(void)
 {
-	CustomCtrls keyallowed={1,1,1,1};
+	CustomCtrls keyallowed = {{1,1,1,1}};
 	EnterCtrlData(10,&keyallowed,DrawCustKeys,PrintCustKeys,KEYBOARDMOVE);
 }
 
@@ -2225,7 +2185,7 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 	{
 	 case MOUSE:
 	   Mouse(3);
-	   button=_BX;
+	   //button=_BX; TODO fix this
 	   switch(button)
 	   {
 	case 1: result=1; break;
@@ -2774,7 +2734,7 @@ void CP_ChangeView(void)
 		}
 
 		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParmNoArgs("goobers"))
 		#else
 		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
 		#endif
@@ -2896,7 +2856,7 @@ void IntroScreen(void)
 #define FILLCOLOR	14
 
 	long memory,emshere,xmshere;
-	int i,num,ems[10]={100,200,300,400,500,600,700,800,900,1000},
+	int i,ems[10]={100,200,300,400,500,600,700,800,900,1000},
 		xms[10]={100,200,300,400,500,600,700,800,900,1000},
 		main[10]={32,64,96,128,160,192,224,256,288,320};
 
@@ -3019,6 +2979,15 @@ void DrawOutline(int x,int y,int w,int h,int color1,int color2)
 	VWB_Vlin(y,y+h,x+w,color1);
 }
 
+struct ffblk
+{
+  char ff_reserved[21];     // Not needed, obviously.
+  char ff_attrib;
+  int ff_ftime;
+  int ff_fdate;
+  long ff_fsize;
+  char ff_name[FILENAME_MAX + 1];   // Sizein Turbo C 2.x.
+};
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -3029,7 +2998,7 @@ void SetupControlPanel(void)
 {
 	struct ffblk f;
 	char name[13];
-	int which,i;
+	int which;
 
 
 	//
@@ -3065,7 +3034,7 @@ void SetupControlPanel(void)
 				char temp[32];
 
 				SaveGamesAvail[which]=1;
-				handle=open(f.ff_name,O_BINARY);
+				handle=open(f.ff_name,O_RDONLY);
 				read(handle,temp,32);
 				close(handle);
 				strcpy(&SaveGameNames[which][0],temp);
@@ -3075,7 +3044,7 @@ void SetupControlPanel(void)
 	//
 	// CENTER MOUSE
 	//
-	_CX=_DX=CENTER;
+	//_CX=_DX=CENTER; TODO FIX THIS
 	Mouse(4);
 }
 
@@ -3175,7 +3144,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype far *items,void (*routine)(int w)
 			// CHECK FOR SCREEN CAPTURE
 			//
 			#ifndef SPEAR
-			if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+			if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParmNoArgs("goobers"))
 			#else
 			if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
 			#endif
@@ -3332,7 +3301,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype far *items,void (*routine)(int w)
 			{
 				ShootSnd();
 				MenuFadeOut();
-				(items+which)->routine(0);
+				//(items+which)->routine(0); TODO fix routines to have the same signature
 			}
 			return which;
 
@@ -3503,13 +3472,13 @@ void ReadAnyControl(ControlInfo *ci)
 		// CHECK MOUSE BUTTONS
 
 		Mouse(3);
-		mousex=_CX;
-		mousey=_DX;
+		// mousex=_CX; TODO fix this
+		// mousey=_DX;  TODO fix this
 
 		if (mousey<CENTER-SENSITIVE)
 		{
 			ci->dir=dir_North;
-			_CX=_DX=CENTER;
+			// _CX=_DX=CENTER;  TODO fix this
 			Mouse(4);
 			mouseactive=1;
 		}
@@ -3517,7 +3486,7 @@ void ReadAnyControl(ControlInfo *ci)
 		if (mousey>CENTER+SENSITIVE)
 		{
 			ci->dir=dir_South;
-			_CX=_DX=CENTER;
+			// _CX=_DX=CENTER;  TODO fix this
 			Mouse(4);
 			mouseactive=1;
 		}
@@ -3525,7 +3494,7 @@ void ReadAnyControl(ControlInfo *ci)
 		if (mousex<CENTER-SENSITIVE)
 		{
 			ci->dir=dir_West;
-			_CX=_DX=CENTER;
+			// _CX=_DX=CENTER;  TODO fix this
 			Mouse(4);
 			mouseactive=1;
 		}
@@ -3533,7 +3502,7 @@ void ReadAnyControl(ControlInfo *ci)
 		if (mousex>CENTER+SENSITIVE)
 		{
 			ci->dir=dir_East;
-			_CX=_DX=CENTER;
+			// _CX=_DX=CENTER;  TODO fix this
 			Mouse(4);
 			mouseactive=1;
 		}
@@ -3590,7 +3559,7 @@ void ReadAnyControl(ControlInfo *ci)
 ////////////////////////////////////////////////////////////////////
 int Confirm(char far *string)
 {
-	int xit=0,i,x,y,tick=0,time,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
+	int xit=0,x,y,tick=0,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
 
 
 	Message(string);
@@ -3623,7 +3592,7 @@ int Confirm(char far *string)
 		}
 
 		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParmNoArg("goobers"))
 			PicturePause();
 		#endif
 
@@ -3722,7 +3691,7 @@ int GetYorN(int x,int y,int pic)
 ////////////////////////////////////////////////////////////////////
 void Message(char far *string)
 {
-	int h=0,w=0,mw=0,i,x,y,time;
+	int h=0,w=0,mw=0,i;
 	fontstruct _seg *font;
 
 
@@ -3730,7 +3699,7 @@ void Message(char far *string)
 	fontnumber=1;
 	font=grsegs[STARTFONT+fontnumber];
 	h=font->height;
-	for (i=0;i<_fstrlen(string);i++)
+	for (i=0;i<strlen(string);i++)
 		if (string[i]=='\n')
 		{
 			if (w>mw)
@@ -3780,7 +3749,7 @@ void StartCPMusic(int song)
 		mmerror = false;
 	else
 	{
-		MM_SetLock(&((memptr)audiosegs[STARTMUSIC + chunk]),true);
+		MM_SetLock((memptr)&(audiosegs[STARTMUSIC + chunk]),true);
 		SD_StartMusic((MusicGroup far *)audiosegs[STARTMUSIC + chunk]);
 	}
 }
@@ -3910,6 +3879,9 @@ void CheckForEpisodes(void)
 		Quit("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
 #else
 
+
+// TODO temp fix
+#define FA_ARCH 0
 //
 // ENGLISH
 //
