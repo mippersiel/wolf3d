@@ -1,6 +1,3 @@
-// ID_GLOB.H
-
-
 #include <malloc.h>
 #include <ctype.h>
 #include <errno.h>
@@ -9,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <values.h>
 #define __ID_GLOB__
@@ -16,9 +14,9 @@
 
 //--------------------------------------------------------------------------
 
-extern	char		far signon;
+extern char far signon;
 
-#define	introscn	signon
+#define introscn signon
 
 #ifdef JAPAN
 #ifdef JAPDEMO
@@ -53,30 +51,28 @@ extern	char		far signon;
 //-----------------
 
 
-#define GREXT	"VGA"
+#define GREXT "VGA"
 
-//
-//	ID Engine
-//	Types.h - Generic types, #defines, etc.
-//	v1.0d1
-//
+typedef enum{
+    false,
+    true
+} boolean;
+typedef uint8_t  byte;
+typedef uint16_t word;
+typedef uint32_t longword;
+typedef byte*    Ptr;
 
-typedef	enum	{false,true}	boolean;
-typedef	unsigned	char		byte;
-typedef	unsigned	int			word;
-typedef	unsigned	long		longword;
-typedef	byte *					Ptr;
+typedef struct {
+    int x;
+    int y;
+} Point;
 
-typedef	struct
-		{
-			int	x,y;
-		} Point;
-typedef	struct
-		{
-			Point	ul,lr;
-		} Rect;
+typedef struct {
+    Point ul;
+    Point lr;
+} Rect;
 
-#define	nil	((void *)0)
+#define nil ((void *)0)
 
 
 #include "id_mm.h"
@@ -89,31 +85,31 @@ typedef	struct
 #include "id_us.h"
 
 
-void	Quit (char *error);		// defined in user program
+void Quit (char *error);  // defined in user program
 
 //
 // replacing refresh manager with custom routines
 //
 
-#define	PORTTILESWIDE		20      // all drawing takes place inside a
-#define	PORTTILESHIGH		13		// non displayed port of this size
+#define PORTTILESWIDE  20      // all drawing takes place inside a
+#define PORTTILESHIGH  13  // non displayed port of this size
 
-#define UPDATEWIDE			PORTTILESWIDE
-#define UPDATEHIGH			PORTTILESHIGH
+#define UPDATEWIDE     PORTTILESWIDE
+#define UPDATEHIGH     PORTTILESHIGH
 
-#define	MAXTICS				10
-#define DEMOTICS			4
+#define MAXTICS        10
+#define DEMOTICS       4
 
-#define	UPDATETERMINATE	0x0301
+#define UPDATETERMINATE 0x0301
 
-extern	unsigned	mapwidth,mapheight,tics;
-extern	boolean		compatability;
+extern unsigned mapwidth, mapheight, tics;
+extern boolean  compatability;
 
-extern	byte		*updateptr;
-extern	unsigned	uwidthtable[UPDATEHIGH];
-extern	unsigned	blockstarts[UPDATEWIDE*UPDATEHIGH];
+extern byte* updateptr;
+extern unsigned uwidthtable[UPDATEHIGH];
+extern unsigned blockstarts[UPDATEWIDE*UPDATEHIGH];
 
-extern	byte		fontcolor,backcolor;
+extern byte fontcolor, backcolor;
 
 #define SETFONTCOLOR(f,b) fontcolor=f;backcolor=b;
 
