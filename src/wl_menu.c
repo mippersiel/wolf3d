@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////////////
 #include "wl_def.h"
 
+#include <dirent.h>
 //
 // PRIVATE PROTOTYPES
 //
@@ -3847,111 +3848,52 @@ void ShootSnd(void)
 // CHECK FOR EPISODES
 //
 ///////////////////////////////////////////////////////////////////////////
-void CheckForEpisodes(void)
+#define DATA_DIR "../data"
+#define FILE_EXT "wl6"
+
+boolean CheckForEpisodes(void)
 {
-	struct ffblk f;
+	struct dirent **namelist;
+	int fileCount, i;
+	boolean extFound = false;
 
-//
-// JAPANESE VERSION
-//
-#ifdef JAPAN
-#ifdef JAPDEMO
-	if (!findfirst("*.WJ1",&f,FA_ARCH))
-	{
-		strcpy(extension,"WJ1");
-#else
-	if (!findfirst("*.WJ6",&f,FA_ARCH))
-	{
-		strcpy(extension,"WJ6");
-#endif
-		strcat(configname,extension);
-		strcat(SaveName,extension);
-		strcat(PageFileName,extension);
-		strcat(audioname,extension);
-		strcat(demoname,extension);
-		EpisodeSelect[1] =
-		EpisodeSelect[2] =
-		EpisodeSelect[3] =
-		EpisodeSelect[4] =
-		EpisodeSelect[5] = 1;
+	// Open folder and get all filenames
+	printf("Checking for episodes in '%s'\n", DATA_DIR);
+	fileCount = scandir(DATA_DIR, &namelist, 0, alphasort);
+	if (fileCount <= 2) {
+	    // Could not open directory or directory is empty (only "." and ".." present)
+	    printf("Error. No episodes files\n");
+	} else {
+	    // Loop through files
+	    for(i = 0; (i < fileCount) && (extFound == false); i++) {
+	        // Skip all files that don't have a wl6 extension
+	        if( (strlen(namelist[i]->d_name) >= 4) && (strcmp(&(namelist[i]->d_name[strlen(namelist[i]->d_name)-4]), "."FILE_EXT) == 0) ) {
+	            extFound = true;
+	        }
+	        free(namelist[i]);
+	    }
+	    free(namelist);
 	}
-	else
-		Quit("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
-#else
 
-
-// TODO temp fix
-#define FA_ARCH 0
-//
-// ENGLISH
-//
-#ifndef UPLOAD
-#ifndef SPEAR
-	if (!findfirst("*.WL6",&f,FA_ARCH))
-	{
-		strcpy(extension,"WL6");
-		NewEmenu[2].active =
-		NewEmenu[4].active =
-		NewEmenu[6].active =
-		NewEmenu[8].active =
-		NewEmenu[10].active =
-		EpisodeSelect[1] =
-		EpisodeSelect[2] =
-		EpisodeSelect[3] =
-		EpisodeSelect[4] =
-		EpisodeSelect[5] = 1;
-	}
-	else
-	if (!findfirst("*.WL3",&f,FA_ARCH))
-	{
-		strcpy(extension,"WL3");
-		NewEmenu[2].active =
-		NewEmenu[4].active =
-		EpisodeSelect[1] =
+	if (extFound) {
+		strcpy(extension, FILE_EXT);
+		NewEmenu[2].active = 1;
+		NewEmenu[4].active = 1;
+		NewEmenu[6].active = 1;
+		NewEmenu[8].active = 1;
+		NewEmenu[10].active = 1;
+		EpisodeSelect[1] = 1;
 		EpisodeSelect[2] = 1;
+		EpisodeSelect[3] = 1;
+		EpisodeSelect[4] = 1;
+		EpisodeSelect[5] = 1;
+
+	    strcat(configname,extension);
+	    strcat(SaveName,extension);
+	    strcat(PageFileName,extension);
+	    strcat(audioname,extension);
+	    strcat(demoname,extension);
 	}
-	else
-#endif
-#endif
 
-
-
-#ifdef SPEAR
-#ifndef SPEARDEMO
-	if (!findfirst("*.SOD",&f,FA_ARCH))
-	{
-		strcpy(extension,"SOD");
-	}
-	else
-		Quit("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
-#else
-	if (!findfirst("*.SDM",&f,FA_ARCH))
-	{
-		strcpy(extension,"SDM");
-	}
-	else
-		Quit("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
-#endif
-
-#else
-	if (!findfirst("*.WL1",&f,FA_ARCH))
-	{
-		strcpy(extension,"WL1");
-	}
-	else
-		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
-#endif
-
-	strcat(configname,extension);
-	strcat(SaveName,extension);
-	strcat(PageFileName,extension);
-	strcat(audioname,extension);
-	strcat(demoname,extension);
-#ifndef SPEAR
-#ifndef GOODTIMES
-	strcat(helpfilename,extension);
-#endif
-	strcat(endfilename,extension);
-#endif
-#endif
+	return extFound;
 }

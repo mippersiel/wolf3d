@@ -190,35 +190,37 @@ void ReadConfig(void)
 
 void WriteConfig(void)
 {
-	int                     file;
+//    int                     file;
+//
+//    file = open(configname,O_CREAT | O_WRONLY,
+//            S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+//
+//    if (file != -1)
+//    {
+//        write(file,Scores,sizeof(HighScore) * MaxScores);
+//
+//        write(file,&SoundMode,sizeof(SoundMode));
+//        write(file,&MusicMode,sizeof(MusicMode));
+//        write(file,&DigiMode,sizeof(DigiMode));
+//
+//        write(file,&mouseenabled,sizeof(mouseenabled));
+//        write(file,&joystickenabled,sizeof(joystickenabled));
+//        write(file,&joypadenabled,sizeof(joypadenabled));
+//        write(file,&joystickprogressive,sizeof(joystickprogressive));
+//        write(file,&joystickport,sizeof(joystickport));
+//
+//        write(file,&dirscan,sizeof(dirscan));
+//        write(file,&buttonscan,sizeof(buttonscan));
+//        write(file,&buttonmouse,sizeof(buttonmouse));
+//        write(file,&buttonjoy,sizeof(buttonjoy));
+//
+//        write(file,&viewsize,sizeof(viewsize));
+//        write(file,&mouseadjustment,sizeof(mouseadjustment));
+//
+//        close(file);
+//    }
 
-	file = open(configname,O_CREAT | O_WRONLY,
-	        S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
-	if (file != -1)
-	{
-		write(file,Scores,sizeof(HighScore) * MaxScores);
-
-		write(file,&SoundMode,sizeof(SoundMode));
-		write(file,&MusicMode,sizeof(MusicMode));
-		write(file,&DigiMode,sizeof(DigiMode));
-
-		write(file,&mouseenabled,sizeof(mouseenabled));
-		write(file,&joystickenabled,sizeof(joystickenabled));
-		write(file,&joypadenabled,sizeof(joypadenabled));
-		write(file,&joystickprogressive,sizeof(joystickprogressive));
-		write(file,&joystickport,sizeof(joystickport));
-
-		write(file,&dirscan,sizeof(dirscan));
-		write(file,&buttonscan,sizeof(buttonscan));
-		write(file,&buttonmouse,sizeof(buttonmouse));
-		write(file,&buttonjoy,sizeof(buttonjoy));
-
-		write(file,&viewsize,sizeof(viewsize));
-		write(file,&mouseadjustment,sizeof(mouseadjustment));
-
-		close(file);
-	}
+    // TODO
 }
 
 
@@ -525,13 +527,15 @@ boolean LoadTheGame(int file,int x,int y)
 
 void ShutdownId (void)
 {
-	US_Shutdown ();
-	SD_Shutdown ();
-	PM_Shutdown ();
-	IN_Shutdown ();
-	VW_Shutdown ();
-	CA_Shutdown ();
-	MM_Shutdown ();
+//	US_Shutdown ();
+//	SD_Shutdown ();
+//	PM_Shutdown ();
+//	IN_Shutdown ();
+//	VW_Shutdown ();
+//	CA_Shutdown ();
+//	MM_Shutdown ();
+
+    //TODO
 }
 
 
@@ -1357,55 +1361,36 @@ void NewViewSize (int width)
 
 void Quit (char *error)
 {
-	//unsigned        finscreen;
-	//memptr	screen;
+    //unsigned        finscreen;
+    //memptr	screen;
 
-	if (virtualreality)
-	{
-	//	geninterrupt(0x61);  TODO check this
-	}
+    if (virtualreality)
+    {
+        //	geninterrupt(0x61);  TODO check this
+    }
 
-	ClearMemory ();
-	if (!*error)
-	{
-	 #ifndef JAPAN
-	 CA_CacheGrChunk (ORDERSCREEN);
-	 //screen = grsegs[ORDERSCREEN];  TODO check this
-	 #endif
-	 WriteConfig ();
-	}
-	else
-	{
-	 CA_CacheGrChunk (ERRORSCREEN);
-	 //screen = grsegs[ERRORSCREEN];  TODO check this
-	}
+    ClearMemory ();
+    if (error)
+    {
+        //CA_CacheGrChunk (ERRORSCREEN); TODO remove this (cache manager)
+        //screen = grsegs[ERRORSCREEN];  TODO check this
+    }
+    else
+    {
+        //CA_CacheGrChunk (ORDERSCREEN); TODO remove this (cache manager)
+        //screen = grsegs[ORDERSCREEN];  TODO check this
+        WriteConfig ();
+    }
 
-	ShutdownId ();
+    ShutdownId ();
 
-	if (error && *error)
-	{
-	  // movedata ((unsigned)screen,7,0xb800,0,7*160); TODO check this
-	  // gotoxy (10,4);  TODO check this
-	  puts(error);
-	  // gotoxy (1,8);  TODO check this
-	  exit(1);
-	}
-	else
-	if (!error || !(*error))
-	{
-		// clrscr();  TODO check this
-		#ifndef JAPAN
-		// movedata ((unsigned)screen,7,0xb800,0,4000);  TODO check this
-		// gotoxy(1,24);  TODO check this
-		#endif
-//asm	mov	bh,0
-//asm	mov	dh,23	// row
-//asm	mov	dl,0	// collumn
-//asm	mov ah,2
-//asm	int	0x10
-	}
+    if (error)
+    {
+        puts(error);
+        exit(1);
+    }
 
-	exit(0);
+    exit(0);
 }
 
 //===========================================================================
@@ -1599,9 +1584,9 @@ int main(int argc, char **argv)
 {
 	CheckForEpisodes();
 
-	InitGame (argc, argv);
+	//InitGame (argc, argv);
 
-	DemoLoop(argc, argv);
+	//DemoLoop(argc, argv);
 
 	Quit("Demo loop exited???");
 }

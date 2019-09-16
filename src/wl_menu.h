@@ -184,7 +184,7 @@ int  CP_CheckQuick(unsigned scancode);
 void CustomControls(void);
 void MouseSensitivity(void);
 
-void CheckForEpisodes(void);
+boolean CheckForEpisodes(void);
 
 //
 // VARIABLES

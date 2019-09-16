@@ -19,23 +19,26 @@ STRIPDEFS = $(patsubst %,-D%=,$(STRIPPED_KW))
 # Source files
 SRCDIR   = src
 SOURCES  = $(SRCDIR)/wl_main.c \
-           $(SRCDIR)/wl_act1.c \
-           $(SRCDIR)/wl_act2.c \
-           $(SRCDIR)/wolfhack.c \
-           $(SRCDIR)/wl_agent.c \
-           $(SRCDIR)/wl_draw.c \
-           $(SRCDIR)/wl_game.c \
-           $(SRCDIR)/wl_state.c \
-           $(SRCDIR)/wl_scale.c \
-           $(SRCDIR)/wl_inter.c \
            $(SRCDIR)/wl_menu.c \
-           $(SRCDIR)/wl_text.c \
-           $(SRCDIR)/wl_play.c
+           $(SRCDIR)/wl_game.c
+
+#           $(SRCDIR)/wl_act1.c \
+#           $(SRCDIR)/wl_act2.c \
+#           $(SRCDIR)/wolfhack.c \
+#           $(SRCDIR)/wl_agent.c \
+#           $(SRCDIR)/wl_draw.c \
+#           $(SRCDIR)/wl_state.c \
+#           $(SRCDIR)/wl_scale.c \
+#           $(SRCDIR)/wl_inter.c \
+#           $(SRCDIR)/wl_text.c \
+#           $(SRCDIR)/wl_play.c \
+#           $(SRCDIR)/id_mm.c
+
+# Sources that aren't modified yet
 #           $(SRCDIR)/contigsc.c \
 #           $(SRCDIR)/detect.c \
 #           $(SRCDIR)/id_ca.c \
 #           $(SRCDIR)/id_in.c \
-#           $(SRCDIR)/id_mm.c \
 #           $(SRCDIR)/id_pm.c \
 #           $(SRCDIR)/id_sd.c \
 #           $(SRCDIR)/id_us_1.c \
@@ -69,9 +72,7 @@ all: $(OUTDIR)/wolf3d
 
 $(OUTDIR)/wolf3d: $(OBJECTS) | $(OUTDIR)
 	@printf "LD\t$(notdir $@)\n"
-#	@$(CC) $(OBJECTS) $(UI_OBJS) $(CSS_OBJS) $(LDFLAGS) -o $@
-# Dont try to link now, too many errors for nothing
-	@touch $@
+	@$(CC) $(OBJECTS) $(UI_OBJS) $(CSS_OBJS) $(LDFLAGS) -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@printf "CC\t$(notdir $<)\n"

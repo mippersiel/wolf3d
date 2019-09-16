@@ -201,9 +201,11 @@ void UpdateSoundLoc(void)
 
 void ClearMemory (void)
 {
-	PM_UnlockMainMem();
-	SD_StopDigitized();
-	MM_SortMem ();
+//	PM_UnlockMainMem();
+//	SD_StopDigitized();
+//	MM_SortMem ();
+
+    // TODO
 }
 
 
