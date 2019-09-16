@@ -26,8 +26,6 @@ EMS / XMS unmanaged routines
 
 #include "id_heads.h"
 
-#pragma warn -pro
-#pragma warn -use
 
 /*
 =============================================================================
@@ -110,7 +108,6 @@ void 		MML_ShutdownEMS (void);
 void 		MM_MapEMS (void);
 boolean 	MML_CheckForXMS (void);
 void 		MML_ShutdownXMS (void);
-void		MML_UseSpace (unsigned segstart, unsigned seglength);
 void 		MML_ClearBlock (void);
 
 //==========================================================================
@@ -127,17 +124,6 @@ void 		MML_ClearBlock (void);
 
 boolean MML_CheckForXMS (void)
 {
-	numUMBs = 0;
-
-asm {
-	mov	ax,0x4300
-	int	0x2f				// query status of installed diver
-	cmp	al,0x80
-	je	good
-	}
-
-	return false;
-good:
 	return true;
 }
 
@@ -154,45 +140,47 @@ good:
 
 void MML_SetupXMS (void)
 {
-	unsigned	base,size;
+	unsigned	base = 0,size = 0;
 
-asm	{
-	mov	ax,0x4310
-	int	0x2f
-	mov	[WORD PTR XMSaddr],bx
-	mov	[WORD PTR XMSaddr+2],es		// function pointer to XMS driver
-	}
+	// TODO fix this
 
-getmemory:
-asm	{
-	mov	ah,XMS_ALLOCUMB
-	mov	dx,0xffff					// try for largest block possible
-	call	[DWORD PTR XMSaddr]
-	or	ax,ax
-	jnz	gotone
-
-	cmp	bl,0xb0						// error: smaller UMB is available
-	jne	done;
-
-	mov	ah,XMS_ALLOCUMB
-	call	[DWORD PTR XMSaddr]		// DX holds largest available UMB
-	or	ax,ax
-	jz	done						// another error...
-	}
-
-gotone:
-asm	{
-	mov	[base],bx
-	mov	[size],dx
-	}
+//asm	{
+//	mov	ax,0x4310
+//	int	0x2f
+//	mov	[WORD PTR XMSaddr],bx
+//	mov	[WORD PTR XMSaddr+2],es		// function pointer to XMS driver
+//	}
+//
+//getmemory:
+//asm	{
+//	mov	ah,XMS_ALLOCUMB
+//	mov	dx,0xffff					// try for largest block possible
+//	call	[DWORD PTR XMSaddr]
+//	or	ax,ax
+//	jnz	gotone
+//
+//	cmp	bl,0xb0						// error: smaller UMB is available
+//	jne	done;
+//
+//	mov	ah,XMS_ALLOCUMB
+//	call	[DWORD PTR XMSaddr]		// DX holds largest available UMB
+//	or	ax,ax
+//	jz	done						// another error...
+//	}
+//
+//gotone:
+//asm	{
+//	mov	[base],bx
+//	mov	[size],dx
+//	}
 	MML_UseSpace (base,size);
 	mminfo.XMSmem += size*16;
 	UMBbase[numUMBs] = base;
 	numUMBs++;
-	if (numUMBs < MAXUMBS)
-		goto getmemory;
-
-done:;
+//	if (numUMBs < MAXUMBS)
+//		goto getmemory;
+//
+//done:;
 }
 
 
@@ -206,17 +194,6 @@ done:;
 
 void MML_ShutdownXMS (void)
 {
-	int	i;
-	unsigned	base;
-
-	for (i=0;i<numUMBs;i++)
-	{
-		base = UMBbase[i];
-
-asm	mov	ah,XMS_FREEUMB
-asm	mov	dx,[base]
-asm	call	[DWORD PTR XMSaddr]
-	}
 }
 
 //==========================================================================
@@ -296,7 +273,7 @@ void MML_UseSpace (unsigned segstart, unsigned seglength)
 
 void MML_ClearBlock (void)
 {
-	mmblocktype far *scan,far *last;
+	mmblocktype far *scan;
 
 	scan = mmhead->next;
 
@@ -327,14 +304,12 @@ void MML_ClearBlock (void)
 ===================
 */
 
-static	char *ParmStrings[] = {"noems","noxms",""};
-
 void MM_Startup (void)
 {
 	int i;
 	unsigned 	long length;
 	void far 	*start;
-	unsigned 	segstart,seglength,endfree;
+	unsigned 	segstart,seglength;
 
 	if (mmstarted)
 		MM_Shutdown ();
@@ -518,7 +493,6 @@ tryagain:
 	if (bombonerror)
 	{
 
-extern char configname[];
 extern	boolean	insetupscaling;
 extern	int	viewsize;
 boolean SetViewSize (unsigned width, unsigned height);
@@ -683,7 +657,7 @@ void MM_SortMem (void)
 			playing += STARTADLIBSOUNDS;
 			break;
 		}
-		MM_SetLock(&(memptr)audiosegs[playing],true);
+		MM_SetLock((memptr)&(audiosegs[playing]),true);
 	}
 
 
@@ -754,7 +728,7 @@ void MM_SortMem (void)
 		aftersort();
 
 	if (playing)
-		MM_SetLock(&(memptr)audiosegs[playing],false);
+		MM_SetLock((memptr)&(audiosegs[playing]),false);
 }
 
 
@@ -772,8 +746,7 @@ void MM_ShowMemory (void)
 {
 	mmblocktype far *scan;
 	unsigned color,temp,x,y;
-	long	end,owner;
-	char    scratch[80],str[10];
+	long	end;
 
 	temp = bufferofs;
 	bufferofs = displayofs;
@@ -862,7 +835,7 @@ void MM_DumpData (void)
 				lock = 'L';
 			else
 				lock = '-';
-			fprintf (dumpfile,"0x%p (%c%c) = %u\n"
+			fprintf (dumpfile,"0x%08X (%c%c) = %u\n"
 			,(unsigned)lowest,lock,purge,best->length);
 		}
 
